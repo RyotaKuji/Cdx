@@ -3,7 +3,7 @@
 static class App
 {
 	static Options CurrentOptions;
-	static void Main(string[] args)
+	static void MainA(string[] args)
 	{
 		CurrentOptions = ParseOptions(args);
 		Console.OutputEncoding = Encoding.GetEncoding("utf-8");
