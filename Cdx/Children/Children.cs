@@ -5,19 +5,15 @@
 	public IEnumerable<FileSystemInfo> FilteredValue => filteredValues;
 	IEnumerable<FileSystemInfo> filteredValues = [];
 
-	string currentDirectory = string.Empty;
-
 	public void SetDirectory(string path)
 	{
-		if (currentDirectory == path)
-		{
-			return;
-		}
-		currentDirectory = path;
-
 		if (Directory.Exists(path))
 		{
-			values = new DirectoryInfo(path).GetFileSystemInfos();
+			values = new DirectoryInfo(path)
+				.GetFileSystemInfos()
+				.OrderBy(x => x is FileInfo)
+				.ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+				.ToList();
 		}
 		else
 		{
@@ -27,6 +23,10 @@
 	public void Filter(IEnumerable<string> searchTerms)
 	{
 		filteredValues = Values.Where(item => searchTerms.All(term => item.Name.Contains(term, StringComparison.OrdinalIgnoreCase)));
-		view.Render(filteredValues);
+	}
+
+	public void Render()
+	{
+		view.Render(FilteredValue);
 	}
 }

@@ -6,6 +6,10 @@
 	{
 		Value = value;
 		Directory.SetCurrentDirectory(value);
-		view.Render(value);
+	}
+
+	public void Render()
+	{
+		view.Render(Value);
 	}
 }

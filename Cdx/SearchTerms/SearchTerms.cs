@@ -7,21 +7,23 @@
 	public void Add(string value)
 	{
 		values.Push(value);
-		view.Render(Values);
 	}
 
-	public void Remove()
+	public void RemoveLast()
 	{
 		if (values.Count > 0)
 		{
 			values.Pop();
-			view.Render(Values);
 		}
 	}
 
 	public void Clear()
 	{
 		values.Clear();
+	}
+
+	public void Render()
+	{
 		view.Render(Values);
 	}
 }
