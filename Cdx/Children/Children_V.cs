@@ -1,9 +1,8 @@
 ﻿internal class Children_V
 {
-	const int CursorTop = 3;
 	public void Render(IEnumerable<FileSystemInfo> values)
 	{
-		Console.SetCursorPosition(0, CursorTop);
+		Console.SetCursorPosition(0, Console.CursorTop);
 		Console.Write("\x1b[J");
 
 		if (values.Any() == false)

@@ -1,6 +1,5 @@
 ﻿internal class Input_V
 {
-	const int CursorTop = 1;
 	public string ReadLine()
 	{
 		return Console.ReadLine() ?? string.Empty;
@@ -18,7 +17,7 @@
 
 	public void Render(string prompt)
 	{
-		Console.SetCursorPosition(0, CursorTop);
+		Console.SetCursorPosition(0, Console.CursorTop);
 		Console.Write("\x1b[2K");
 		Console.Write(prompt);
 	}

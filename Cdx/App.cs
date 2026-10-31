@@ -6,9 +6,10 @@ internal class App(
 	SearchTerms searchTerms,
 	Children children,
 	History history,
-	Message message)
+	Message message,
+	Renderer renderer)
 {
-	public string Run(DirectoryInfo initialCurrentDirectory, FileInfo? resultFile)
+	public string Run(DirectoryInfo initialCurrentDirectory)
 	{
 		Console.OutputEncoding = Encoding.GetEncoding("utf-8");
 		if (AccessManager.IsValidDirectory(initialCurrentDirectory) == false)
@@ -21,18 +22,7 @@ internal class App(
 		children.Filter(searchTerms.Values);
 		while (true)
 		{
-			Console.CursorVisible = false;
-			if (message.HasValue)
-			{
-				message.Render();
-			}
-			else
-			{
-				currentDirectory.Render();
-			}
-			searchTerms.Render();
-			children.Render();
-			Console.CursorVisible = true;
+			renderer.Render();
 
 			ConsoleKeyInfo keyInfo = input.ReadKey();
 			ConsoleKey key = keyInfo.Key;

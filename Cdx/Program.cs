@@ -15,6 +15,7 @@ services.AddSingleton<Children_V>();
 services.AddSingleton<Message>();
 services.AddSingleton<Message_V>();
 services.AddSingleton<History>();
+services.AddSingleton<Renderer>();
 
 using ServiceProvider provider = services.BuildServiceProvider();
 
@@ -41,13 +42,28 @@ rootCommand.Options.Add(currentDirectoryOption);
 rootCommand.Options.Add(writeResultOption);
 rootCommand.SetAction(parseResult =>
 {
-	DirectoryInfo currentDirectory =
-		parseResult.GetValue(currentDirectoryOption) ?? new(Path.GetPathRoot(Environment.CurrentDirectory) ?? throw new InvalidOperationException("Cannot determine the root directory."));
+	DirectoryInfo currentDirectory = parseResult.GetValue(currentDirectoryOption) ?? new(Path.GetPathRoot(Environment.CurrentDirectory) ?? throw new InvalidOperationException("Cannot determine the root directory."));
+	FileInfo? outFile = parseResult.GetValue(writeResultOption);
 
-	FileInfo? outFile =
-		parseResult.GetValue(writeResultOption);
+	string result = app.Run(currentDirectory);
 
-	app.Run(currentDirectory, outFile);
+	Console.Clear();
+
+	try
+	{
+		if (outFile is not null)
+		{
+			File.WriteAllText(outFile.FullName, result);
+		}
+		else
+		{
+			Console.WriteLine(result);
+		}
+	}
+	catch (Exception ex)
+	{
+		Console.WriteLine(ex);
+	}
 });
 
 return rootCommand.Parse(args).Invoke();

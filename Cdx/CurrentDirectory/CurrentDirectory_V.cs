@@ -1,10 +1,8 @@
 ﻿internal class CurrentDirectory_V
 {
-	const int CursorTop = 0;
-
 	public void Render(string value)
 	{
-		Console.SetCursorPosition(0, CursorTop);
+		Console.SetCursorPosition(0, Console.CursorTop);
 		Console.Write("\x1b[2K");
 		Console.WriteLine(value);
 	}
