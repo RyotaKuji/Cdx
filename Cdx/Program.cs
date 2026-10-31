@@ -23,14 +23,14 @@ Option<DirectoryInfo> currentDirectoryOption =
 	new("--current-directory")
 	{
 		Description = "Set the current directory",
-		Required = false
+		Required = false,
 	};
 
 Option<FileInfo> writeResultOption =
 	new("--write-result")
 	{
 		Description = "Write the result to a file",
-		Required = false
+		Required = false,
 	};
 
 RootCommand rootCommand = new("Cdx");
@@ -39,13 +39,13 @@ rootCommand.Options.Add(currentDirectoryOption);
 rootCommand.Options.Add(writeResultOption);
 rootCommand.SetAction(parseResult =>
 {
-	DirectoryInfo path =
+	DirectoryInfo currentDirectory =
 		parseResult.GetValue(currentDirectoryOption) ?? new(@"C:\");
 
 	FileInfo? outFile =
 		parseResult.GetValue(writeResultOption);
 
-	app.Run(path, outFile);
+	app.Run(currentDirectory, outFile);
 });
 
 return rootCommand.Parse(args).Invoke();
