@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.CommandLine;
+using System.Text;
 
 internal class App(
 	Input input,
@@ -7,14 +8,14 @@ internal class App(
 	Children children,
 	History history)
 {
-	public void Run()
+	public void Run(DirectoryInfo initialCurrentDirectory, FileInfo? resultFile)
 	{
 		Console.OutputEncoding = Encoding.GetEncoding("utf-8");
-		if (AccessManager.IsValidDirectory(new DirectoryInfo(@"C:\")) == false)
+		if (AccessManager.IsValidDirectory(initialCurrentDirectory) == false)
 		{
 			throw new InvalidOperationException("The initial directory is not valid.");
 		}
-		currentDirectory.SetValue(@"C:\");
+		currentDirectory.SetValue(initialCurrentDirectory.FullName);
 		history.Add(currentDirectory.Value);
 		children.SetDirectory(currentDirectory.Value);
 		children.Filter(searchTerms.Values);
@@ -24,18 +25,13 @@ internal class App(
 			currentDirectory.Render();
 			searchTerms.Render();
 			children.Render();
-			input.Render();
 			Console.CursorVisible = true;
 
 			ConsoleKeyInfo keyInfo = input.ReadKey();
 			ConsoleKey key = keyInfo.Key;
 			ActionResolver.State nextActionState;
-			if (key == ConsoleKey.Backspace)
-			{
-				searchTerms.RemoveLast();
-				nextActionState = ActionResolver.Resolve(children.FilteredValue);
-			}
-			else if (key == ConsoleKey.Enter)
+			// 一番上の候補を選択する
+			if (key == ConsoleKey.Enter)
 			{
 				if (children.FilteredValue.Any())
 				{
@@ -46,6 +42,7 @@ internal class App(
 					nextActionState = ActionResolver.Resolve([]);
 				}
 			}
+			// Undo
 			else if (key == ConsoleKey.LeftArrow)
 			{
 				string? undoPath = history.TryGetUndoPath();
@@ -58,6 +55,7 @@ internal class App(
 					nextActionState = ActionResolver.Resolve([]);
 				}
 			}
+			// Redo
 			else if (key == ConsoleKey.RightArrow)
 			{
 				string? redoPath = history.TryGetRedoPath();
@@ -70,14 +68,32 @@ internal class App(
 					nextActionState = ActionResolver.Resolve([]);
 				}
 			}
+			// 親ディレクトリに移動する
 			else if (key == ConsoleKey.UpArrow)
 			{
-				nextActionState = ActionResolver.Resolve(children.FilteredValue);
+				string? parentDirectory = Directory.GetParent(currentDirectory.Value)?.FullName;
+				if (parentDirectory is not null)
+				{
+					nextActionState = ActionResolver.Resolve([new DirectoryInfo(parentDirectory)]);
+				}
+				else
+				{
+					nextActionState = ActionResolver.Resolve([]);
+				}
 			}
-			else if (key == ConsoleKey.DownArrow)
+			// 検索ワードを削除する
+			else if (key == ConsoleKey.Backspace)
 			{
+				searchTerms.RemoveLast();
 				nextActionState = ActionResolver.Resolve(children.FilteredValue);
 			}
+			// 検索ワードを全て削除する
+			else if (key == ConsoleKey.Escape)
+			{
+				searchTerms.Clear();
+				nextActionState = ActionResolver.Resolve(children.FilteredValue);
+			}
+			// 検索ワードを追加する
 			else
 			{
 				string text = input.ReadLine(keyInfo);
@@ -87,6 +103,7 @@ internal class App(
 
 			if (nextActionState.Action == ActionResolver.ActionType.OpenFile)
 			{
+				Result.Return(nextActionState.FilePath, resultFile);
 			}
 			else if (nextActionState.Action == ActionResolver.ActionType.ChangeDirectory)
 			{

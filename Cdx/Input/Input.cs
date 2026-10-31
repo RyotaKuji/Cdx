@@ -2,6 +2,7 @@
 {
 	public string ReadLine()
 	{
+		view.Render(mode_prompt[InputMode.Text]);
 		string input = view.ReadLine();
 		return input;
 	}
@@ -21,12 +22,21 @@
 
 	public ConsoleKeyInfo ReadKey()
 	{
+		view.Render(mode_prompt[InputMode.Command]);
+		Console.CursorVisible = false;
 		ConsoleKeyInfo key = view.ReadKey();
 		return key;
 	}
 
-	public void Render()
+	enum InputMode
 	{
-		view.Render();
+		Text,
+		Command,
 	}
+
+	static Dictionary<InputMode, string> mode_prompt = new()
+	{
+		{ InputMode.Text, "> " },
+		{ InputMode.Command, "[COMMAND]" },
+	};
 }

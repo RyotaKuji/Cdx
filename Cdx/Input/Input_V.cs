@@ -16,10 +16,10 @@
 		ConsoleInput.Write(text);
 	}
 
-	public void Render()
+	public void Render(string prompt)
 	{
 		Console.SetCursorPosition(0, CursorTop);
 		Console.Write("\x1b[2K");
-		Console.Write("> ");
+		Console.Write(prompt);
 	}
 }
