@@ -1,14 +1,14 @@
-﻿using System.CommandLine;
-using System.Text;
+﻿using System.Text;
 
 internal class App(
 	Input input,
 	CurrentDirectory currentDirectory,
 	SearchTerms searchTerms,
 	Children children,
-	History history)
+	History history,
+	Message message)
 {
-	public void Run(DirectoryInfo initialCurrentDirectory, FileInfo? resultFile)
+	public string Run(DirectoryInfo initialCurrentDirectory, FileInfo? resultFile)
 	{
 		Console.OutputEncoding = Encoding.GetEncoding("utf-8");
 		if (AccessManager.IsValidDirectory(initialCurrentDirectory) == false)
@@ -22,7 +22,14 @@ internal class App(
 		while (true)
 		{
 			Console.CursorVisible = false;
-			currentDirectory.Render();
+			if (message.HasValue)
+			{
+				message.Render();
+			}
+			else
+			{
+				currentDirectory.Render();
+			}
 			searchTerms.Render();
 			children.Render();
 			Console.CursorVisible = true;
@@ -103,7 +110,7 @@ internal class App(
 
 			if (nextActionState.Action == ActionResolver.ActionType.OpenFile)
 			{
-				Result.Return(nextActionState.FilePath, resultFile);
+				return nextActionState.FilePath;
 			}
 			else if (nextActionState.Action == ActionResolver.ActionType.ChangeDirectory)
 			{
@@ -125,6 +132,10 @@ internal class App(
 				children.SetDirectory(currentDirectory.Value);
 				searchTerms.Clear();
 				children.Filter(searchTerms.Values);
+			}
+			else if (nextActionState.Action == ActionResolver.ActionType.Cancel)
+			{
+				message.SetValue(nextActionState.Message);
 			}
 			else if (nextActionState.Action == ActionResolver.ActionType.None)
 			{

@@ -22,7 +22,7 @@
 				}
 				else
 				{
-					return new();
+					return new(ActionType.Cancel, Message: $"The directory {singleItem.FullName} is not valid.");
 				}
 			}
 			else if (singleItem is FileInfo file)
@@ -36,12 +36,12 @@
 				}
 				else
 				{
-					return new();
+					return new(ActionType.Cancel, Message: $"The file {singleItem.FullName} is not valid.");
 				}
 			}
 			else
 			{
-				return new();
+				return new(ActionType.Cancel, Message: $"The item {singleItem.FullName} is not valid.");
 			}
 		}
 
@@ -54,7 +54,8 @@
 	public record struct State(
 		ActionType Action = ActionType.None,
 		string Directory = "",
-		string FilePath = ""
+		string FilePath = "",
+		string Message = ""
 	);
 
 	public enum ActionType
@@ -62,5 +63,6 @@
 		None,
 		ChangeDirectory,
 		OpenFile,
+		Cancel,
 	}
 }

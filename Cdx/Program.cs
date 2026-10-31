@@ -12,6 +12,8 @@ services.AddSingleton<SearchTerms>();
 services.AddSingleton<SearchTerms_V>();
 services.AddSingleton<Children>();
 services.AddSingleton<Children_V>();
+services.AddSingleton<Message>();
+services.AddSingleton<Message_V>();
 services.AddSingleton<History>();
 
 using ServiceProvider provider = services.BuildServiceProvider();
@@ -40,7 +42,7 @@ rootCommand.Options.Add(writeResultOption);
 rootCommand.SetAction(parseResult =>
 {
 	DirectoryInfo currentDirectory =
-		parseResult.GetValue(currentDirectoryOption) ?? new(@"C:\");
+		parseResult.GetValue(currentDirectoryOption) ?? new(Path.GetPathRoot(Environment.CurrentDirectory) ?? throw new InvalidOperationException("Cannot determine the root directory."));
 
 	FileInfo? outFile =
 		parseResult.GetValue(writeResultOption);
