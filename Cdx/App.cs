@@ -10,6 +10,10 @@ internal class App(
 	public void Run()
 	{
 		Console.OutputEncoding = Encoding.GetEncoding("utf-8");
+		if (AccessManager.IsValidDirectory(new DirectoryInfo(@"C:\")) == false)
+		{
+			throw new InvalidOperationException("The initial directory is not valid.");
+		}
 		currentDirectory.SetValue(@"C:\");
 		history.Add(currentDirectory.Value);
 		children.SetDirectory(currentDirectory.Value);
