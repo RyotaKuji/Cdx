@@ -4,19 +4,20 @@
 	{
 		view.Render(mode_prompt[InputMode.Text]);
 		string input = view.ReadLine();
-		return input;
+		string formattedText = new(input.Where(c => !char.IsControl(c)).ToArray());
+		return formattedText;
 	}
 
 	public string ReadLine(ConsoleKeyInfo initialKey)
 	{
-		List<ConsoleKeyInfo> keys = [initialKey];
+		List<ConsoleKeyInfo> sendKeys = [initialKey];
 		while (Console.KeyAvailable)
 		{
 			ConsoleKeyInfo additionalKey = Console.ReadKey(true);
-			keys.Add(additionalKey);
+			sendKeys.Add(additionalKey);
 		}
-		string sendText = new(keys.Select(k => k.KeyChar).Where(c => !char.IsControl(c)).ToArray());
-		view.AddBufferText(sendText);
+		string formattedText = new(sendKeys.Select(k => k.KeyChar).Where(c => !char.IsControl(c)).ToArray());
+		view.AddBufferText(formattedText);
 		return ReadLine();
 	}
 

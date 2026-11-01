@@ -6,6 +6,10 @@
 
 	public void Add(string value)
 	{
+		if (string.IsNullOrEmpty(value))
+		{
+			return;
+		}
 		values.Push(value);
 	}
 
