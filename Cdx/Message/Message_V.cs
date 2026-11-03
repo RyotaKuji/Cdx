@@ -1,9 +1,12 @@
-﻿internal class Message_V
+﻿using Spectre.Console;
+using Spectre.Console.Rendering;
+
+internal class Message_V(Message model)
 {
-	public void Render(string value)
+	public bool HasValue => string.IsNullOrEmpty(model.Value) == false;
+	public IRenderable GetComp()
 	{
-		Console.SetCursorPosition(0, Console.CursorTop);
-		Console.Write("\x1b[2K");
-		Console.WriteLine(value);
+		Panel panel = new(model.Value);
+		return panel;
 	}
 }

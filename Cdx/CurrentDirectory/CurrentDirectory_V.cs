@@ -1,9 +1,11 @@
-﻿internal class CurrentDirectory_V
+﻿using Spectre.Console;
+using Spectre.Console.Rendering;
+
+internal class CurrentDirectory_V(CurrentDirectory model)
 {
-	public void Render(string value)
+	public IRenderable GetComp()
 	{
-		Console.SetCursorPosition(0, Console.CursorTop);
-		Console.Write("\x1b[2K");
-		Console.WriteLine(value);
+		TextPath textPath = new(model.Value);
+		return textPath;
 	}
 }

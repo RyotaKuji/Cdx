@@ -1,59 +1,38 @@
-﻿internal class Children_V
+﻿using Spectre.Console;
+using Spectre.Console.Rendering;
+
+internal class Children_V(Children model)
 {
-	public void Render(IEnumerable<FileSystemInfo> values)
+	public IRenderable GetComp(int columnsCount, int height, int page)
 	{
-		Console.SetCursorPosition(0, Console.CursorTop);
-		Console.Write("\x1b[J");
+		Grid grid = new Grid()
+			.AddColumns(columnsCount);
 
-		if (values.Any() == false)
+		List<FileSystemInfo> values = model.FilteredValue.ToList();
+
+		int itemsCountPerPage = columnsCount * height;
+		int startIndex = itemsCountPerPage * page;
+
+		for (int i = 0; i < height; i++)
 		{
-			Console.WriteLine("(no items match)");
-			return;
+			List<FileSystemInfo> row = [];
+			for (int j = 0; j < columnsCount; j++)
+			{
+				int index = startIndex + height * j + i;
+				if (index < values.Count)
+				{
+					row.Add(values[index]);
+				}
+			}
+			grid.AddRow(row.Select(GetItemText).ToArray());
 		}
 
-		int startTop = Console.CursorTop;
-		int startLeft = 0;
-		int currentTop = startTop;
-		int currentLeft = startLeft;
-		int maxRow = Console.WindowHeight - 1;
-
-		int maxItemWidth = values
-			.Select(item => GetItemText(item).Length)
-			.DefaultIfEmpty(0)
-			.Max();
-
-		int columnWidth = Math.Clamp(maxItemWidth, 1, Console.WindowWidth / 3);
-
-		foreach (FileSystemInfo item in values)
-		{
-			if (currentTop > maxRow)
-			{
-				currentTop = startTop;
-				currentLeft += columnWidth;
-			}
-
-			if (currentLeft >= Console.WindowWidth)
-			{
-				break;
-			}
-
-			string text = GetItemText(item);
-
-			Console.SetCursorPosition(currentLeft, currentTop);
-			int writableWidth = Math.Max(1, Console.WindowWidth - currentLeft);
-			if (text.Length > writableWidth)
-			{
-				text = text[..Math.Max(0, writableWidth - 1)];
-			}
-			Console.Write(text);
-
-			currentTop++;
-		}
+		return grid;
 	}
 
 	static string GetItemText(FileSystemInfo item)
 	{
 		string marker = item is DirectoryInfo ? "📁" : "📄";
-		return $"{marker} {item.Name}";
+		return $"{marker}　{item.Name}";
 	}
 }

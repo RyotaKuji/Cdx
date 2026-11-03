@@ -1,4 +1,4 @@
-﻿internal class CurrentDirectory(CurrentDirectory_V view)
+﻿internal class CurrentDirectory
 {
 	public string Value { get; private set; } = string.Empty;
 
@@ -6,10 +6,5 @@
 	{
 		Value = value;
 		Directory.SetCurrentDirectory(value);
-	}
-
-	public void Render()
-	{
-		view.Render(Value);
 	}
 }

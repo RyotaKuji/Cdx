@@ -2,8 +2,7 @@
 {
 	public string ReadLine()
 	{
-		view.Render(mode_prompt[InputMode.Text]);
-		string input = view.ReadLine();
+		string input = view.ReadLine() ?? string.Empty;
 		string formattedText = new(input.Where(c => !char.IsControl(c)).ToArray());
 		return formattedText;
 	}
@@ -23,21 +22,8 @@
 
 	public ConsoleKeyInfo ReadKey()
 	{
-		view.Render(mode_prompt[InputMode.Command]);
 		Console.CursorVisible = false;
 		ConsoleKeyInfo key = view.ReadKey();
 		return key;
 	}
-
-	enum InputMode
-	{
-		Text,
-		Command,
-	}
-
-	static Dictionary<InputMode, string> mode_prompt = new()
-	{
-		{ InputMode.Text, "> " },
-		{ InputMode.Command, "[COMMAND]" },
-	};
 }

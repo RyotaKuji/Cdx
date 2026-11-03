@@ -1,4 +1,4 @@
-﻿internal class SearchTerms(SearchTerms_V view)
+﻿internal class SearchTerms
 {
 	public IEnumerable<string> Values => values.Reverse();
 
@@ -24,10 +24,5 @@
 	public void Clear()
 	{
 		values.Clear();
-	}
-
-	public void Render()
-	{
-		view.Render(Values);
 	}
 }

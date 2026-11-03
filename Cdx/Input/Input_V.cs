@@ -1,12 +1,20 @@
-﻿internal class Input_V
+﻿using Spectre.Console;
+using Spectre.Console.Rendering;
+
+internal class Input_V
 {
-	public string ReadLine()
+	public string? ReadLine()
 	{
-		return Console.ReadLine() ?? string.Empty;
+		Console.SetCursorPosition(0, 0);
+		Console.Write("\x1b[2K");
+		Console.Write("> ");
+		Console.CursorVisible = true;
+		return Console.ReadLine();
 	}
 
 	public ConsoleKeyInfo ReadKey()
 	{
+		Console.CursorVisible = false;
 		return Console.ReadKey(true);
 	}
 
@@ -15,10 +23,9 @@
 		ConsoleInput.Write(text);
 	}
 
-	public void Render(string prompt)
+	public IRenderable GetComp()
 	{
-		Console.SetCursorPosition(0, Console.CursorTop);
-		Console.Write("\x1b[2K");
-		Console.Write(prompt);
+		Text text = new("> ");
+		return text;
 	}
 }

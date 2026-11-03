@@ -1,9 +1,11 @@
-﻿internal class SearchTerms_V
+﻿using Spectre.Console;
+using Spectre.Console.Rendering;
+
+internal class SearchTerms_V(SearchTerms model)
 {
-	public void Render(IEnumerable<string> values)
+	public IRenderable GetComp()
 	{
-		Console.SetCursorPosition(0, Console.CursorTop);
-		Console.Write("\x1b[2K");
-		Console.WriteLine(string.Join(" | ", values));
+		Text text = new(string.Join(" | ", model.Values));
+		return text;
 	}
 }
