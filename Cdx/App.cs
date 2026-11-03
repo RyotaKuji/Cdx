@@ -5,6 +5,7 @@ internal class App(
 	CurrentDirectory currentDirectory,
 	SearchTerms searchTerms,
 	Children children,
+	Clipboard clipboard,
 	History history,
 	Message message,
 	Renderer renderer)
@@ -84,10 +85,16 @@ internal class App(
 				searchTerms.RemoveLast();
 				nextActionState = ActionResolver.Resolve(children.FilteredValue);
 			}
-			// 検索ワードを全て削除する
+			// リセット
 			else if (key == ConsoleKey.Escape)
 			{
 				searchTerms.Clear();
+				clipboard.Clear();
+				nextActionState = ActionResolver.Resolve(children.FilteredValue);
+			}
+			else if (key == ConsoleKey.DownArrow)
+			{
+				clipboard.Capture(currentDirectory.Value, [.. children.FilteredValue]);
 				nextActionState = ActionResolver.Resolve(children.FilteredValue);
 			}
 			// 検索ワードを追加する

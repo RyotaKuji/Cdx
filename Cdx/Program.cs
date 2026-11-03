@@ -12,6 +12,8 @@ services.AddSingleton<SearchTerms>();
 services.AddSingleton<SearchTerms_V>();
 services.AddSingleton<Children>();
 services.AddSingleton<Children_V>();
+services.AddSingleton<Clipboard>();
+services.AddSingleton<Clipboard_V>();
 services.AddSingleton<Message>();
 services.AddSingleton<Message_V>();
 services.AddSingleton<History>();
