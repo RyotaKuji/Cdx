@@ -48,7 +48,7 @@ internal class Renderer
 		IRenderable comp_input = input.GetComp();
 		IRenderable comp_searchTerms = searchTerms.GetComp();
 		IRenderable comp_currentDirectory = currentDirectory.GetComp();
-		IRenderable comp_children = children.GetComp(3, 10, 0);
+		IRenderable comp_children = children.GetComp(3, Console.WindowWidth, 10, 0);
 		layout_input.Update(comp_input);
 		layout_searchTerm.Update(comp_searchTerms);
 		layout_currentDirectory.Update(comp_currentDirectory);
