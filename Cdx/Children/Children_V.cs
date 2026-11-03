@@ -7,10 +7,15 @@ internal class Children_V(Children model)
 {
 	public IRenderable GetComp(int columnsCount, int width, int height, int page)
 	{
+		List<FileSystemInfo> values = model.FilteredValue.ToList();
+
+		if (values.Count == 0)
+		{
+			return new Text("(No items found)");
+		}
+
 		Grid grid = new Grid()
 			.AddColumns(columnsCount);
-
-		List<FileSystemInfo> values = model.FilteredValue.ToList();
 
 		int itemsCountPerPage = columnsCount * height;
 		int startIndex = itemsCountPerPage * page;

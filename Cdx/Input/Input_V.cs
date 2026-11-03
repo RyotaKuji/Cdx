@@ -14,6 +14,9 @@ internal class Input_V
 
 	public ConsoleKeyInfo ReadKey()
 	{
+		Console.SetCursorPosition(0, 0);
+		Console.Write("\x1b[2K");
+		Console.Write("[CMD]");
 		Console.CursorVisible = false;
 		return Console.ReadKey(true);
 	}
@@ -25,7 +28,7 @@ internal class Input_V
 
 	public IRenderable GetComp()
 	{
-		Text text = new("> ");
+		Text text = new("");
 		return text;
 	}
 }

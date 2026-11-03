@@ -5,9 +5,9 @@ internal class Renderer
 {
 	readonly Layout layout = new();
 
-	readonly Layout layout_currentDirectory = new() { Size = 1 };
 	readonly Layout layout_input = new() { Size = 1 };
 	readonly Layout layout_searchTerm = new() { Size = 1 };
+	readonly Layout layout_currentDirectory = new() { Size = 1 };
 	readonly Layout layout_main = new();
 	readonly Layout layout_children = new();
 	readonly Layout layout_clip = new();
@@ -19,22 +19,21 @@ internal class Renderer
 	readonly Message_V message;
 
 	public Renderer(
-		CurrentDirectory_V currentDirectory,
 		Input_V input,
 		SearchTerms_V searchTerms,
+		CurrentDirectory_V currentDirectory,
 		Children_V children,
 		Message_V message)
 	{
-		this.currentDirectory = currentDirectory;
 		this.input = input;
 		this.searchTerms = searchTerms;
+		this.currentDirectory = currentDirectory;
 		this.children = children;
 		this.message = message;
 		Layout layout_blank = new Layout().Update(new Rule()).Size(1);
 		layout.SplitRows(
 				layout_input,
 				layout_searchTerm,
-				layout_blank,
 				layout_currentDirectory,
 				layout_blank,
 				layout_main);
