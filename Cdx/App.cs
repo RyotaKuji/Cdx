@@ -25,7 +25,7 @@ internal class App(
 		{
 			renderer.Render();
 
-			ConsoleKeyInfo keyInfo = input.ReadKey();
+			ConsoleKeyInfo keyInfo = input.ReadKey(Input.InputMode.Command);
 			ConsoleKey key = keyInfo.Key;
 			ActionResolver.State nextActionState;
 			// 一番上の候補を選択する
@@ -99,37 +99,23 @@ internal class App(
 				clipboard.Capture(children.Values);
 				nextActionState = ActionResolver.Resolve([]);
 			}
-			else if (key == ConsoleKey.D && keyInfo.Modifiers.HasFlag(ConsoleModifiers.Alt))
-			{
-				string text = input.ReadLine(keyInfo);
-				/*
-				foreach (FileSystemInfo info in clipboard.Values[currentDirectory.Value])
-				{
-					if (info is DirectoryInfo dirInfo)
-					{
-						if (AccessManager.IsValidDirectory(dirInfo))
-						{
-							Directory.Delete(dirInfo.FullName, true);
-						}
-					}
-					else if (info is FileInfo fileInfo)
-					{
-						if (AccessManager.IsValidFile(fileInfo))
-						{
-							File.Delete(fileInfo.FullName);
-						}
-					}
-				}
-				*/
-				children.SetDirectory(currentDirectory.Value);
-				nextActionState = ActionResolver.Resolve(children.FilteredValue);
-			}
-			// 検索ワードを追加する
+			// 入力
 			else
 			{
-				string text = input.ReadLine(keyInfo);
-				searchTerms.Add(text);
-				nextActionState = ActionResolver.Resolve(children.FilteredValue);
+				string text = input.ReadLine(keyInfo, Input.InputMode.Input);
+				if (text.StartsWith(':'))
+				{
+					string[] commandParts = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+					if (commandParts[0].Equals(":copy", StringComparison.OrdinalIgnoreCase))
+					{
+					}
+					nextActionState = ActionResolver.Resolve(children.FilteredValue);
+				}
+				else
+				{
+					searchTerms.Add(text);
+					nextActionState = ActionResolver.Resolve(children.FilteredValue);
+				}
 			}
 
 			if (nextActionState.Action == ActionResolver.ActionType.OpenFile)

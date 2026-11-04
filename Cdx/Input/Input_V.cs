@@ -3,20 +3,20 @@ using Spectre.Console.Rendering;
 
 internal class Input_V
 {
-	public string? ReadLine()
+	public string? ReadLine(string prompt)
 	{
 		Console.SetCursorPosition(0, 0);
 		Console.Write("\x1b[2K");
-		Console.Write("> ");
+		Console.Write(prompt);
 		Console.CursorVisible = true;
 		return Console.ReadLine();
 	}
 
-	public ConsoleKeyInfo ReadKey()
+	public ConsoleKeyInfo ReadKey(string prompt)
 	{
 		Console.SetCursorPosition(0, 0);
 		Console.Write("\x1b[2K");
-		Console.Write("[CMD]");
+		Console.Write(prompt);
 		Console.CursorVisible = false;
 		return Console.ReadKey(true);
 	}
