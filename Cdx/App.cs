@@ -92,9 +92,32 @@ internal class App(
 				clipboard.Clear();
 				nextActionState = ActionResolver.Resolve(children.FilteredValue);
 			}
+			// クリップボードに追加
 			else if (key == ConsoleKey.DownArrow)
 			{
 				clipboard.Capture(currentDirectory.Value, [.. children.FilteredValue]);
+				nextActionState = ActionResolver.Resolve([]);
+			}
+			else if (key == ConsoleKey.D && keyInfo.Modifiers.HasFlag(ConsoleModifiers.Alt))
+			{
+				foreach (FileSystemInfo info in clipboard.Values[currentDirectory.Value])
+				{
+					if (info is DirectoryInfo dirInfo)
+					{
+						if (AccessManager.IsValidDirectory(dirInfo))
+						{
+							Directory.Delete(dirInfo.FullName, true);
+						}
+					}
+					else if (info is FileInfo fileInfo)
+					{
+						if (AccessManager.IsValidFile(fileInfo))
+						{
+							File.Delete(fileInfo.FullName);
+						}
+					}
+				}
+				children.SetDirectory(currentDirectory.Value);
 				nextActionState = ActionResolver.Resolve(children.FilteredValue);
 			}
 			// 検索ワードを追加する
