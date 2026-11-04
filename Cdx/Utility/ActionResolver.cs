@@ -18,7 +18,7 @@
 				{
 					return new(
 						Action: ActionType.ChangeDirectory,
-						Directory: singleItem.FullName);
+						Directory: directory);
 				}
 				else
 				{
@@ -31,7 +31,7 @@
 				{
 					return new(
 						Action: ActionType.OpenFile,
-						Directory: file.DirectoryName ?? Directory.GetCurrentDirectory(),
+						Directory: file.Directory ?? new(Directory.GetCurrentDirectory()),
 						FilePath: file.FullName);
 				}
 				else
@@ -53,7 +53,7 @@
 
 	public record struct State(
 		ActionType Action = ActionType.None,
-		string Directory = "",
+		DirectoryInfo? Directory = null,
 		string FilePath = "",
 		string Message = ""
 	);

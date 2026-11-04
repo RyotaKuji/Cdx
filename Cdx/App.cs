@@ -17,7 +17,7 @@ internal class App(
 		{
 			throw new InvalidOperationException("The initial directory is not valid.");
 		}
-		currentDirectory.SetValue(initialCurrentDirectory.FullName);
+		currentDirectory.SetValue(initialCurrentDirectory);
 		history.Add(currentDirectory.Value);
 		children.SetDirectory(currentDirectory.Value);
 		children.Filter(searchTerms.Values);
@@ -43,10 +43,10 @@ internal class App(
 			// Undo
 			else if (key == ConsoleKey.LeftArrow)
 			{
-				string? undoPath = history.TryGetUndoPath();
+				DirectoryInfo? undoPath = history.TryGetUndoPath();
 				if (undoPath is not null)
 				{
-					nextActionState = ActionResolver.Resolve([new DirectoryInfo(undoPath)]);
+					nextActionState = ActionResolver.Resolve([undoPath]);
 				}
 				else
 				{
@@ -56,10 +56,10 @@ internal class App(
 			// Redo
 			else if (key == ConsoleKey.RightArrow)
 			{
-				string? redoPath = history.TryGetRedoPath();
+				DirectoryInfo? redoPath = history.TryGetRedoPath();
 				if (redoPath is not null)
 				{
-					nextActionState = ActionResolver.Resolve([new DirectoryInfo(redoPath)]);
+					nextActionState = ActionResolver.Resolve([redoPath]);
 				}
 				else
 				{
@@ -69,10 +69,10 @@ internal class App(
 			// 親ディレクトリに移動する
 			else if (key == ConsoleKey.UpArrow)
 			{
-				string? parentDirectory = Directory.GetParent(currentDirectory.Value)?.FullName;
+				DirectoryInfo? parentDirectory = currentDirectory.Value.Parent;
 				if (parentDirectory is not null)
 				{
-					nextActionState = ActionResolver.Resolve([new DirectoryInfo(parentDirectory)]);
+					nextActionState = ActionResolver.Resolve([parentDirectory]);
 				}
 				else
 				{
@@ -95,11 +95,14 @@ internal class App(
 			// クリップボードに追加
 			else if (key == ConsoleKey.DownArrow)
 			{
-				clipboard.Capture(currentDirectory.Value, [.. children.FilteredValue]);
+				clipboard.Capture([currentDirectory.Value]);
+				clipboard.Capture(children.Values);
 				nextActionState = ActionResolver.Resolve([]);
 			}
 			else if (key == ConsoleKey.D && keyInfo.Modifiers.HasFlag(ConsoleModifiers.Alt))
 			{
+				string text = input.ReadLine(keyInfo);
+				/*
 				foreach (FileSystemInfo info in clipboard.Values[currentDirectory.Value])
 				{
 					if (info is DirectoryInfo dirInfo)
@@ -117,6 +120,7 @@ internal class App(
 						}
 					}
 				}
+				*/
 				children.SetDirectory(currentDirectory.Value);
 				nextActionState = ActionResolver.Resolve(children.FilteredValue);
 			}
@@ -136,17 +140,17 @@ internal class App(
 			{
 				if (key == ConsoleKey.LeftArrow)
 				{
-					string path = history.Undo() ?? throw new InvalidOperationException("Cannot undo because there is no history.");
+					DirectoryInfo path = history.Undo() ?? throw new InvalidOperationException("Cannot undo because there is no history.");
 					currentDirectory.SetValue(path);
 				}
 				else if (key == ConsoleKey.RightArrow)
 				{
-					string path = history.Redo() ?? throw new InvalidOperationException("Cannot redo because there is no history.");
+					DirectoryInfo path = history.Redo() ?? throw new InvalidOperationException("Cannot redo because there is no history.");
 					currentDirectory.SetValue(path);
 				}
 				else
 				{
-					currentDirectory.SetValue(nextActionState.Directory);
+					currentDirectory.SetValue(nextActionState.Directory ?? throw new InvalidOperationException("Cannot change directory because the directory is null."));
 					history.Add(nextActionState.Directory);
 				}
 				children.SetDirectory(currentDirectory.Value);

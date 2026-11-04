@@ -6,36 +6,25 @@ internal class Clipboard_V(Clipboard model)
 	const int maxChildrenCount = 4;
 	public IRenderable GetComp(int width)
 	{
-		int index = 0;
 		Grid grid = new Grid().AddColumns(2);
-		foreach (var parent_children in model.Values)
+		for (int i = 0; i < model.Values.Count; i++)
 		{
-			string parent = parent_children.Key;
-			IEnumerable<FileSystemInfo> children = parent_children.Value;
-			grid.AddRow(new Text($"${index}"), new TextPath(parent));
-			grid.AddEmptyRow();
-			index++;
-			if (children.Any())
+			IEnumerable<FileSystemInfo> items = model.Values[i];
+			int displayedCount = 0;
+			foreach (FileSystemInfo item in items)
 			{
-				int currentChildrenCount = 0;
-				foreach (FileSystemInfo child in children)
+				Text indexText = displayedCount == 0 ? new($"${i}") : Text.Empty;
+				grid.AddRow(indexText, new TextPath(item.FullName));
+				displayedCount++;
+				if (displayedCount > maxChildrenCount)
 				{
-					string childIndexText = currentChildrenCount == 0 ? $"${index}" : string.Empty;
-					grid.AddRow(new Text(childIndexText), new Text(child.Name));
-
-					currentChildrenCount++;
-
-					if (currentChildrenCount >= maxChildrenCount)
+					int remainingCount = items.Count() - displayedCount;
+					if (remainingCount > 0)
 					{
-						int remainingChildCount = children.Count() - currentChildrenCount;
-						if (remainingChildCount > 0)
-						{
-							grid.AddRow(Text.Empty, new Text($" ⋮ +{remainingChildCount}"));
-						}
-						break;
+						grid.AddRow(Text.Empty, new Text($" ⋮ +{remainingCount}"));
 					}
+					break;
 				}
-				index++;
 			}
 			grid.AddEmptyRow();
 		}

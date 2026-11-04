@@ -4,11 +4,11 @@
 
 	public IEnumerable<FileSystemInfo> FilteredValue { get; private set; } = [];
 
-	public void SetDirectory(string path)
+	public void SetDirectory(DirectoryInfo path)
 	{
-		if (Directory.Exists(path))
+		if (path.Exists)
 		{
-			Values = new DirectoryInfo(path)
+			Values = path
 				.GetFileSystemInfos()
 				.OrderBy(x => x is FileInfo)
 				.ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)

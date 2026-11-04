@@ -1,10 +1,10 @@
 ﻿internal class CurrentDirectory
 {
-	public string Value { get; private set; } = string.Empty;
+	public DirectoryInfo Value { get; private set; } = new(Directory.GetCurrentDirectory());
 
-	public void SetValue(string value)
+	public void SetValue(DirectoryInfo value)
 	{
 		Value = value;
-		Directory.SetCurrentDirectory(value);
+		Directory.SetCurrentDirectory(value.FullName);
 	}
 }

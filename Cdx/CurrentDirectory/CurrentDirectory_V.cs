@@ -5,7 +5,7 @@ internal class CurrentDirectory_V(CurrentDirectory model)
 {
 	public IRenderable GetComp()
 	{
-		TextPath textPath = new(model.Value)
+		TextPath textPath = new(model.Value.FullName)
 		{
 			RootStyle = new(Color.Gray),
 			StemStyle = new(Color.Gray),
