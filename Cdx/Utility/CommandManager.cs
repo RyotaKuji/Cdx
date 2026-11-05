@@ -64,7 +64,6 @@ internal static partial class CommandManager
 				StandardErrorEncoding = Encoding.UTF8
 			};
 			startInfo.ArgumentList.Add("-Command");
-			startInfo.ArgumentList.Add("-NonInteractive");
 			startInfo.ArgumentList.Add(
 				$"""
 				[Console]::OutputEncoding = [Text.Encoding]::UTF8;
