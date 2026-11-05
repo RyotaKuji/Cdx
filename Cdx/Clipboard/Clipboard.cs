@@ -4,6 +4,10 @@
 
 	public void Capture(IEnumerable<FileSystemInfo> items)
 	{
+		if (items.Any() == false)
+		{
+			return;
+		}
 		Values.Add(items);
 	}
 

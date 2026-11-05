@@ -4,7 +4,7 @@ using Spectre.Console.Rendering;
 internal class Clipboard_V(Clipboard model)
 {
 	const int maxChildrenCount = 4;
-	public IRenderable GetComp()
+	public IRenderable GetComp(int height)
 	{
 		Grid grid = new Grid().AddColumns(2);
 		for (int i = 0; i < model.Values.Count; i++)
@@ -28,7 +28,11 @@ internal class Clipboard_V(Clipboard model)
 			}
 			grid.AddEmptyRow();
 		}
-		Panel panel = new(grid) { Expand = true, };
+		Panel panel = new(grid)
+		{
+			Border = BoxBorder.Rounded,
+			Height = height
+		};
 		return panel;
 	}
 

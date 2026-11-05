@@ -5,6 +5,5 @@
 	public void SetValue(DirectoryInfo value)
 	{
 		Value = value;
-		Directory.SetCurrentDirectory(value.FullName);
 	}
 }

@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 internal static partial class CommandManager
 {
 	static readonly Regex clipboardIndexPattern = ReplacedPattern();
-	public static (string output, string error) Execute(string command, DirectoryInfo currentDirectory, Clipboard clipboard)
+	public static (string output, string error) Execute(string command, CurrentDirectory currentDirectory, Clipboard clipboard)
 	{
 		string[] commandParts = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 		StringBuilder formattedCommand = new();
@@ -30,15 +30,19 @@ internal static partial class CommandManager
 						string formattedFilePath = string.Empty;
 						if (clipboardItem is DirectoryInfo directory)
 						{
-							formattedFilePath = directory.Parent?.FullName ?? string.Empty;
-							formattedFilePath = $"\"{prefix}{directory.Name}{suffix}\"";
+							formattedFilePath = Path.Combine(
+								directory.Parent?.FullName ?? string.Empty,
+								$"{prefix}{directory.Name}{suffix}"
+							);
 						}
 						else if (clipboardItem is FileInfo file)
 						{
-							formattedFilePath = file.DirectoryName ?? string.Empty;
-							formattedFilePath = $"\"{prefix}{Path.GetFileName(file.Name)}{suffix}{Path.GetFileNameWithoutExtension(file.Name)}\"";
+							formattedFilePath = Path.Combine(
+								file.DirectoryName ?? string.Empty,
+								$"{prefix}{Path.GetFileNameWithoutExtension(file.Name)}{suffix}{Path.GetExtension(file.Name)}"
+							);
 						}
-						formattedFilePaths.Add(formattedFilePath);
+						formattedFilePaths.Add($"\"{formattedFilePath}\"");
 					}
 					formattedPart = string.Join(",", formattedFilePaths);
 				}
@@ -51,7 +55,7 @@ internal static partial class CommandManager
 			ProcessStartInfo startInfo = new()
 			{
 				FileName = "pwsh",
-				WorkingDirectory = currentDirectory.FullName,
+				WorkingDirectory = currentDirectory.Value.FullName,
 				CreateNoWindow = true,
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
@@ -60,6 +64,7 @@ internal static partial class CommandManager
 				StandardErrorEncoding = Encoding.UTF8
 			};
 			startInfo.ArgumentList.Add("-Command");
+			startInfo.ArgumentList.Add("-NonInteractive");
 			startInfo.ArgumentList.Add(
 				$"""
 				[Console]::OutputEncoding = [Text.Encoding]::UTF8;
@@ -72,6 +77,7 @@ internal static partial class CommandManager
 			string output = process.StandardOutput.ReadToEnd();
 			string error = process.StandardError.ReadToEnd();
 			process.WaitForExit();
+
 			return (output, error);
 		}
 		catch (Exception ex)

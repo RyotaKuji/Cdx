@@ -6,11 +6,12 @@ internal class Renderer
 	readonly Layout layout = new();
 
 	readonly Layout layout_input = new() { Size = 1 };
-	readonly Layout layout_searchTerm = new() { Size = 1 };
-	readonly Layout layout_message = new();
 	readonly Layout layout_main = new();
-	readonly Layout layout_main_left = new() { Ratio = 3 };
-	readonly Layout layout_main_right = new() { Ratio = 1 };
+	readonly Layout layout_bottomColumns = new();
+	readonly Layout layout_bottomColumns_left = new() { Ratio = 3 };
+	readonly Layout layout_bottomColumns_right = new() { Ratio = 1 };
+
+	readonly Rule rule_blank = new() { Border = BoxBorder.None };
 
 	readonly CurrentDirectory_V currentDirectory;
 	readonly Input_V input;
@@ -36,35 +37,21 @@ internal class Renderer
 		Layout layout_blank = new Layout().Update(new Rule()).Size(1);
 		layout.SplitRows(
 				layout_input,
-				layout_searchTerm,
-				layout_message,
-				layout_blank,
 				layout_main);
-		layout_main.SplitColumns(layout_main_left, layout_main_right);
+		layout_bottomColumns.SplitColumns(layout_bottomColumns_left, layout_bottomColumns_right);
 		layout_blank.Update(new Rule() { Border = BoxBorder.None });
 	}
 
 	public void Render()
 	{
-		Console.Clear();
 		IRenderable comp_input = input.GetComp();
 		IRenderable comp_searchTerms = searchTerms.GetComp();
+		IRenderable comp_currentDirectory = currentDirectory.GetComp();
+		IRenderable comp_message = message.GetComp();
+
 		layout_input.Update(comp_input);
-		layout_searchTerm.Update(comp_searchTerms);
 
-		if (message.HasValue)
-		{
-			IRenderable comp_message = message.GetComp();
-			layout_message.Update(comp_message);
-			layout_message.Size = null;
-		}
-		else
-		{
-			IRenderable comp_currentDirectory = currentDirectory.GetComp();
-			layout_message.Update(comp_currentDirectory);
-			layout_message.Size = 1;
-		}
-
+		int bottomHeight = Console.WindowHeight - 4;
 		int childrenWidth;
 		int childrenColumnsCount;
 
@@ -73,8 +60,8 @@ internal class Renderer
 			childrenWidth = Console.WindowWidth / 4 * 3;
 			childrenColumnsCount = 3;
 
-			IRenderable comp_clipboard = clipboard.GetComp();
-			layout_main_right.Update(comp_clipboard);
+			IRenderable comp_clipboard = clipboard.GetComp(bottomHeight);
+			layout_bottomColumns_right.Update(comp_clipboard);
 		}
 		else
 		{
@@ -82,10 +69,26 @@ internal class Renderer
 			childrenColumnsCount = 4;
 		}
 
-		IRenderable comp_children = children.GetComp(childrenColumnsCount, childrenWidth, 10, 0);
-		layout_main_left.Update(comp_children);
-		layout_main_right.IsVisible = clipboard.HasValue;
+		IRenderable comp_children = children.GetComp(childrenColumnsCount, childrenWidth, bottomHeight, 0);
+		layout_bottomColumns_left.Update(comp_children);
+		layout_bottomColumns_right.IsVisible = clipboard.HasValue;
 
+		List<IRenderable> components = [];
+
+		components.Add(comp_searchTerms);
+		if (message.HasValue)
+		{
+			components.Add(comp_message);
+		}
+		components.Add(comp_currentDirectory);
+		components.Add(rule_blank);
+		components.Add(layout_bottomColumns);
+
+		Rows rows_main = new(components);
+
+		layout_main.Update(rows_main);
+
+		AnsiConsole.Clear();
 		AnsiConsole.Write(layout);
 	}
 }

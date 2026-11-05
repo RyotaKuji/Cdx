@@ -107,10 +107,16 @@ internal class App(
 				string text = input.ReadLine(keyInfo, Input.InputMode.Input);
 				if (text.StartsWith(':'))
 				{
-					(string output, string error) = CommandManager.Execute(text.TrimStart(':'), currentDirectory.Value, clipboard);
+					Console.CursorVisible = false;
+					(string output, string error) = CommandManager.Execute(text.TrimStart(':'), currentDirectory, clipboard);
+
 					if (string.IsNullOrEmpty(error) == false)
 					{
 						message.SetValue(error);
+					}
+					else
+					{
+						message.SetValue(output);
 					}
 					children.SetDirectory(currentDirectory.Value);
 					children.Filter(searchTerms.Values);
