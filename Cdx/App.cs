@@ -108,7 +108,7 @@ internal class App(
 				if (text.StartsWith(':'))
 				{
 					Console.CursorVisible = false;
-					(string output, string error) = CommandManager.Execute(text.TrimStart(':'), currentDirectory, clipboard);
+					(string output, string error) = CommandManager.Execute(text.TrimStart(':'), currentDirectory.Value, clipboard);
 
 					if (string.IsNullOrEmpty(error) == false)
 					{

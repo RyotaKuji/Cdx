@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 internal static partial class CommandManager
 {
 	static readonly Regex clipboardIndexPattern = ReplacedPattern();
-	public static (string output, string error) Execute(string command, CurrentDirectory currentDirectory, Clipboard clipboard)
+	public static (string output, string error) Execute(string command, DirectoryInfo currentDirectory, Clipboard clipboard)
 	{
 		string[] commandParts = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 		StringBuilder formattedCommand = new();
@@ -55,7 +55,7 @@ internal static partial class CommandManager
 			ProcessStartInfo startInfo = new()
 			{
 				FileName = "pwsh",
-				WorkingDirectory = currentDirectory.Value.FullName,
+				WorkingDirectory = currentDirectory.FullName,
 				CreateNoWindow = true,
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
