@@ -25,6 +25,8 @@ internal class App(
 		{
 			renderer.Render();
 
+			message.SetValue(string.Empty);
+
 			ConsoleKeyInfo keyInfo = input.ReadKey(Input.InputMode.Command);
 			ConsoleKey key = keyInfo.Key;
 			ActionResolver.State nextActionState;
@@ -105,11 +107,14 @@ internal class App(
 				string text = input.ReadLine(keyInfo, Input.InputMode.Input);
 				if (text.StartsWith(':'))
 				{
-					string[] commandParts = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-					if (commandParts[0].Equals(":copy", StringComparison.OrdinalIgnoreCase))
+					(string output, string error) = CommandManager.Execute(text.TrimStart(':'), currentDirectory.Value, clipboard);
+					if (string.IsNullOrEmpty(error) == false)
 					{
+						message.SetValue(error);
 					}
-					nextActionState = ActionResolver.Resolve(children.FilteredValue);
+					children.SetDirectory(currentDirectory.Value);
+					children.Filter(searchTerms.Values);
+					nextActionState = ActionResolver.Resolve([]);
 				}
 				else
 				{

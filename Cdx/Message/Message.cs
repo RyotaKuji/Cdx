@@ -5,5 +5,6 @@
 	public void SetValue(string value)
 	{
 		Value = value;
+		//Value = new(value.Where(c => char.IsControl(c) == false).ToArray());
 	}
 }

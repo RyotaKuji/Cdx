@@ -4,7 +4,7 @@ using Spectre.Console.Rendering;
 internal class Clipboard_V(Clipboard model)
 {
 	const int maxChildrenCount = 4;
-	public IRenderable GetComp(int width)
+	public IRenderable GetComp()
 	{
 		Grid grid = new Grid().AddColumns(2);
 		for (int i = 0; i < model.Values.Count; i++)
@@ -13,7 +13,7 @@ internal class Clipboard_V(Clipboard model)
 			int displayedCount = 0;
 			foreach (FileSystemInfo item in items)
 			{
-				Text indexText = displayedCount == 0 ? new($"${i}") : Text.Empty;
+				Text indexText = displayedCount == 0 ? new($"<{i}>") : Text.Empty;
 				grid.AddRow(indexText, new TextPath(item.FullName));
 				displayedCount++;
 				if (displayedCount > maxChildrenCount)
@@ -28,7 +28,8 @@ internal class Clipboard_V(Clipboard model)
 			}
 			grid.AddEmptyRow();
 		}
-		return grid;
+		Panel panel = new(grid) { Expand = true, };
+		return panel;
 	}
 
 	public bool HasValue => model.Values.Count > 0;
