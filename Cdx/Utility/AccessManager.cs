@@ -13,7 +13,7 @@ internal static class AccessManager
 
 		try
 		{
-			directory.EnumerateFileSystemInfos();
+			using var _ = directory.EnumerateFileSystemInfos().GetEnumerator();
 			return true;
 		}
 		catch
@@ -30,10 +30,8 @@ internal static class AccessManager
 		}
 		try
 		{
-			using (file.OpenRead())
-			{
-				return true;
-			}
+			using var _ = file.OpenRead();
+			return true;
 		}
 		catch
 		{
