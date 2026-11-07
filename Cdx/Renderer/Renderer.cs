@@ -11,8 +11,6 @@ internal class Renderer
 	readonly Layout layout_bottomColumns_left = new() { Ratio = 3 };
 	readonly Layout layout_bottomColumns_right = new() { Ratio = 1 };
 
-	readonly Rule rule_blank = new() { Border = BoxBorder.None };
-
 	readonly CurrentDirectory_V currentDirectory;
 	readonly Input_V input;
 	readonly SearchTerms_V searchTerms;
@@ -69,7 +67,7 @@ internal class Renderer
 			childrenColumnsCount = 4;
 		}
 
-		IRenderable comp_children = children.GetComp(childrenColumnsCount, childrenWidth, bottomHeight, 0);
+		IRenderable comp_children = children.GetComp(childrenColumnsCount, childrenWidth, bottomHeight);
 		layout_bottomColumns_left.Update(comp_children);
 		layout_bottomColumns_right.IsVisible = clipboard.HasValue;
 
@@ -81,7 +79,6 @@ internal class Renderer
 			components.Add(comp_message);
 		}
 		components.Add(comp_currentDirectory);
-		components.Add(rule_blank);
 		components.Add(layout_bottomColumns);
 
 		Rows rows_main = new(components);

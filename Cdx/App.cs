@@ -5,6 +5,7 @@ internal class App(
 	CurrentDirectory currentDirectory,
 	SearchTerms searchTerms,
 	Children children,
+	Children_V children_V,
 	Clipboard clipboard,
 	History history,
 	Message message,
@@ -81,6 +82,18 @@ internal class App(
 					nextActionState = ActionResolver.Resolve([]);
 				}
 			}
+			// ページを進む
+			else if (key == ConsoleKey.PageUp)
+			{
+				children_V.PageUp();
+				nextActionState = ActionResolver.Resolve([]);
+			}
+			// ページを戻る
+			else if (key == ConsoleKey.PageDown)
+			{
+				children_V.PageDown();
+				nextActionState = ActionResolver.Resolve([]);
+			}
 			// 検索ワードを削除する
 			else if (key == ConsoleKey.Backspace)
 			{
@@ -97,8 +110,18 @@ internal class App(
 			// クリップボードに追加
 			else if (key == ConsoleKey.DownArrow)
 			{
-				clipboard.Capture([currentDirectory.Value]);
-				clipboard.Capture(children.Values);
+				clipboard.Capture([currentDirectory.Value], Clipboard.ClipboardItemType.Parent);
+				clipboard.Capture(children.FilteredValue, Clipboard.ClipboardItemType.Child);
+				nextActionState = ActionResolver.Resolve([]);
+			}
+			else if (key == ConsoleKey.Home)
+			{
+				children_V.ShowHead();
+				nextActionState = ActionResolver.Resolve([]);
+			}
+			else if (key == ConsoleKey.End)
+			{
+				children_V.ShowTail();
 				nextActionState = ActionResolver.Resolve([]);
 			}
 			// 入力

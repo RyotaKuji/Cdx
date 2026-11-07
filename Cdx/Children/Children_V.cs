@@ -5,46 +5,72 @@ using Spectre.Console.Rendering;
 
 internal class Children_V(Children model)
 {
-	public IRenderable GetComp(int columnsCount, int width, int height, int page)
+	int page = 0;
+	bool showTail = false;
+
+	public IRenderable GetComp(int columnsCount, int width, int height)
 	{
 		List<FileSystemInfo> values = model.FilteredValue.ToList();
 
 		if (values.Count == 0)
 		{
-			return new Text("(No items found)");
+			return new Grid()
+				.AddColumn()
+				.AddRow(new Text("1 / 1  ") { Justification = Justify.Right })
+				.AddRow(new Text("(No items found.)"))
+				.Expand();
 		}
 
 		Grid grid = new Grid()
-			.AddColumns(columnsCount);
+			.AddColumns(columnsCount)
+			.Expand();
 
-		int itemsCountPerPage = columnsCount * height;
+		int innerHeight = height - 1;
+		int itemsCountPerPage = columnsCount * innerHeight;
+		int totalPages = (int)Math.Ceiling((double)values.Count / itemsCountPerPage);
+		page = Math.Clamp(page, 0, totalPages - 1);
 		int startIndex = itemsCountPerPage * page;
 		int maxWidth = width / columnsCount - 2;
 
-		for (int i = 0; i < height; i++)
+		Text[] pageIndexRow = Enumerable.Repeat(Text.Empty, columnsCount - 1)
+			.Append(new Text($"{page + 1} / {totalPages}  ") { Justification = Justify.Right })
+			.ToArray();
+
+		grid.AddRow(pageIndexRow);
+
+		for (int i = 0; i < innerHeight; i++)
 		{
 			List<FileSystemInfo> row = [];
 			for (int j = 0; j < columnsCount; j++)
 			{
-				int index = startIndex + height * j + i;
+				int index = startIndex + innerHeight * j + i;
 				if (index < values.Count)
 				{
 					row.Add(values[index]);
 				}
 			}
-			grid.AddRow(row.Select(GetItemText).Select(text => TruncateByWidth(text, maxWidth)).ToArray());
+			grid.AddRow(row.Select(
+				info => $"{GetItemMarker(info)} {TruncateByWidth(info.Name, maxWidth - 2, showTail)}"
+			).ToArray());
 		}
 
 		return grid;
 	}
 
-	static string GetItemText(FileSystemInfo item)
+	public void PageUp() => page--;
+
+	public void PageDown() => page++;
+
+	public void ShowHead() => showTail = false;
+
+	public void ShowTail() => showTail = true;
+
+	static string GetItemMarker(FileSystemInfo item)
 	{
-		string marker = item is DirectoryInfo ? "📁" : "📄";
-		return $"{marker} {item.Name}";
+		return item is DirectoryInfo ? "📁" : "📄";
 	}
 
-	static string TruncateByWidth(string text, int maxWidth)
+	static string TruncateByWidth(string text, int maxWidth, bool showTail)
 	{
 		if (maxWidth <= 0)
 		{
@@ -54,7 +80,13 @@ internal class Children_V(Children model)
 		int width = 0;
 		var result = new StringBuilder();
 
-		foreach (Rune rune in text.EnumerateRunes())
+		IEnumerable<Rune> enumerator = text.EnumerateRunes();
+		if (showTail)
+		{
+			enumerator = enumerator.Reverse();
+		}
+
+		foreach (Rune rune in enumerator)
 		{
 			var category = Rune.GetUnicodeCategory(rune);
 
@@ -73,6 +105,11 @@ internal class Children_V(Children model)
 
 			result.Append(rune);
 			width += charWidth;
+		}
+
+		if (showTail)
+		{
+			return string.Concat(result.ToString().EnumerateRunes().Reverse());
 		}
 
 		return result.ToString();

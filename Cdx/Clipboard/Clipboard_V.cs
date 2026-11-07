@@ -9,12 +9,32 @@ internal class Clipboard_V(Clipboard model)
 		Grid grid = new Grid().AddColumns(2);
 		for (int i = 0; i < model.Values.Count; i++)
 		{
-			IEnumerable<FileSystemInfo> items = model.Values[i];
+			Clipboard.ClipboardItemType type = model.Values[i].Type;
+			IEnumerable<FileSystemInfo> items = model.Values[i].Info;
 			int displayedCount = 0;
 			foreach (FileSystemInfo item in items)
 			{
 				Text indexText = displayedCount == 0 ? new($"<{i}>") : Text.Empty;
-				grid.AddRow(indexText, new TextPath(item.FullName));
+
+				string path = type == Clipboard.ClipboardItemType.Parent ?
+					item.FullName :
+					item.Name;
+
+				IRenderable pathComp;
+				if (type == Clipboard.ClipboardItemType.Parent)
+				{
+					pathComp = new Text(item.FullName);
+				}
+				else
+				{
+					pathComp = new Panel(new Text(item.Name))
+					{
+						Padding = new(2, 0, 0, 0),
+						Border = BoxBorder.None,
+					};
+				}
+
+				grid.AddRow(indexText, pathComp);
 				displayedCount++;
 				if (displayedCount > maxChildrenCount)
 				{
@@ -31,7 +51,8 @@ internal class Clipboard_V(Clipboard model)
 		Panel panel = new(grid)
 		{
 			Border = BoxBorder.Rounded,
-			Height = height
+			Height = height,
+			Expand = true,
 		};
 		return panel;
 	}

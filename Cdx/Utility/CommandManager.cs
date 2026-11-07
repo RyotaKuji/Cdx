@@ -23,7 +23,7 @@ internal static partial class CommandManager
 
 				if (clipboard.Values.Count > index)
 				{
-					IEnumerable<FileSystemInfo> clipboardItems = clipboard.Values[index];
+					IEnumerable<FileSystemInfo> clipboardItems = clipboard.Values[index].Info;
 					List<string> formattedFilePaths = [];
 					foreach (FileSystemInfo clipboardItem in clipboardItems)
 					{
