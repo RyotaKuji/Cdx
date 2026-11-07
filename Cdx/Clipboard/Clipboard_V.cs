@@ -41,7 +41,7 @@ internal class Clipboard_V(Clipboard model)
 					int remainingCount = items.Count() - displayedCount;
 					if (remainingCount > 0)
 					{
-						grid.AddRow(Text.Empty, new Text($" ⋮ +{remainingCount}"));
+						grid.AddRow(Text.Empty, new Text($"   ⋮ +{remainingCount}"));
 					}
 					break;
 				}

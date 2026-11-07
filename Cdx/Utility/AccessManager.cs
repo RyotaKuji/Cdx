@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-internal static class AccessManager
+﻿internal static class AccessManager
 {
 	public static bool IsValidDirectory(DirectoryInfo directory)
 	{
