@@ -1,36 +1,31 @@
 ﻿internal static class AccessManager
 {
-	public static bool IsValidDirectory(DirectoryInfo directory)
+	public static bool IsValidDirectory(DirectoryInfo directory, out string exceptionMessage)
 	{
-		if (directory.Exists == false)
-		{
-			return false;
-		}
-
 		try
 		{
 			using var _ = directory.EnumerateFileSystemInfos().GetEnumerator();
+			exceptionMessage = string.Empty;
 			return true;
 		}
-		catch
+		catch (Exception ex)
 		{
+			exceptionMessage = ex.Message;
 			return false;
 		}
 	}
 
-	public static bool IsValidFile(FileInfo file)
+	public static bool IsValidFile(FileInfo file, out string exceptionMessage)
 	{
-		if (file.Exists == false)
-		{
-			return false;
-		}
 		try
 		{
 			using var _ = file.OpenRead();
+			exceptionMessage = string.Empty;
 			return true;
 		}
-		catch
+		catch (Exception ex)
 		{
+			exceptionMessage = ex.Message;
 			return false;
 		}
 	}

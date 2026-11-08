@@ -14,9 +14,9 @@ internal class App(
 	public string Run(DirectoryInfo initialCurrentDirectory)
 	{
 		Console.OutputEncoding = Encoding.GetEncoding("utf-8");
-		if (AccessManager.IsValidDirectory(initialCurrentDirectory) == false)
+		if (AccessManager.IsValidDirectory(initialCurrentDirectory, out string exceptionMessage) == false)
 		{
-			throw new InvalidOperationException("The initial directory is not valid.");
+			throw new InvalidOperationException(exceptionMessage);
 		}
 		currentDirectory.SetValue(initialCurrentDirectory);
 		history.Add(currentDirectory.Value);
@@ -129,8 +129,9 @@ internal class App(
 			// 入力
 			else
 			{
-				string text;
 				bool isRowCommand = keyInfo.KeyChar == ':';
+
+				string text;
 				if (isRowCommand)
 				{
 					text = input.ReadLine(Input.InputMode.RowCommand);

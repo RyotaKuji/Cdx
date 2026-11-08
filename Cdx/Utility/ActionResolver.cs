@@ -14,7 +14,7 @@
 			FileSystemInfo singleItem = filteredItems.First();
 			if (singleItem is DirectoryInfo directory)
 			{
-				if (AccessManager.IsValidDirectory(directory))
+				if (AccessManager.IsValidDirectory(directory, out string exceptionMessage))
 				{
 					return new(
 						Action: ActionType.ChangeDirectory,
@@ -22,21 +22,21 @@
 				}
 				else
 				{
-					return new(ActionType.Cancel, Message: $"The directory {singleItem.FullName} is not valid.");
+					return new(ActionType.Cancel, Message: exceptionMessage);
 				}
 			}
 			else if (singleItem is FileInfo file)
 			{
-				if (AccessManager.IsValidFile(file))
+				if (AccessManager.IsValidFile(file, out string exceptionMessage))
 				{
 					return new(
 						Action: ActionType.OpenFile,
-						Directory: file.Directory ?? new(Directory.GetCurrentDirectory()),
+						Directory: file.Directory,
 						FilePath: file.FullName);
 				}
 				else
 				{
-					return new(ActionType.Cancel, Message: $"The file {singleItem.FullName} is not valid.");
+					return new(ActionType.Cancel, Message: exceptionMessage);
 				}
 			}
 			else
