@@ -63,10 +63,13 @@ internal static partial class CommandManager
 				StandardOutputEncoding = Encoding.UTF8,
 				StandardErrorEncoding = Encoding.UTF8
 			};
+			startInfo.ArgumentList.Add("-NonInteractive");
 			startInfo.ArgumentList.Add("-Command");
 			startInfo.ArgumentList.Add(
 				$"""
+				[Console]::InputEncoding = [Text.Encoding]::UTF8;
 				[Console]::OutputEncoding = [Text.Encoding]::UTF8;
+				$OutputEncoding = [Console]::OutputEncoding;
 				$PSStyle.OutputRendering = 'PlainText';
 				$ErrorView = 'NormalView';
 				{formattedCommand}
