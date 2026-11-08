@@ -20,4 +20,6 @@
 	{
 		FilteredValue = Values.Where(item => searchTerms.All(term => item.Name.Contains(term, StringComparison.OrdinalIgnoreCase)));
 	}
+
+	public FileSystemInfo? GetBestMatchItem() => FilteredValue.MinBy(x => x.Name.Length);
 }

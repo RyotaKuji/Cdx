@@ -34,9 +34,10 @@ internal class App(
 			// 一番上の候補を選択する
 			if (key == ConsoleKey.Enter)
 			{
-				if (children.FilteredValue.Any())
+				FileSystemInfo? selectedItem = children.GetBestMatchItem();
+				if (selectedItem is not null)
 				{
-					nextActionState = ActionResolver.Resolve([children.FilteredValue.First()]);
+					nextActionState = ActionResolver.Resolve([selectedItem]);
 				}
 				else
 				{
@@ -146,6 +147,11 @@ internal class App(
 					string formattedText = text.TrimStart(':');
 					if (string.IsNullOrWhiteSpace(formattedText) == false)
 					{
+						if (formattedText.Equals("q", StringComparison.OrdinalIgnoreCase) ||
+							formattedText.Equals("quit", StringComparison.OrdinalIgnoreCase))
+						{
+							return currentDirectory.Value.FullName;
+						}
 						(string output, string error) = CommandManager.Execute(formattedText, currentDirectory.Value, clipboard);
 						if (string.IsNullOrEmpty(error) == false)
 						{
