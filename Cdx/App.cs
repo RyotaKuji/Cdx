@@ -28,7 +28,7 @@ internal class App(
 
 			message.SetValue(string.Empty);
 
-			ConsoleKeyInfo keyInfo = input.ReadKey(Input.InputMode.Command);
+			ConsoleKeyInfo keyInfo = input.ReadKey(Input.InputMode.AppCommand);
 			ConsoleKey key = keyInfo.Key;
 			ActionResolver.State nextActionState;
 			// 一番上の候補を選択する
@@ -114,11 +114,13 @@ internal class App(
 				clipboard.Capture(children.FilteredValue, Clipboard.ClipboardItemType.Child);
 				nextActionState = ActionResolver.Resolve([]);
 			}
+			// Children の表示を先頭から表示する
 			else if (key == ConsoleKey.Home)
 			{
 				children_V.ShowHead();
 				nextActionState = ActionResolver.Resolve([]);
 			}
+			// Children の表示を末尾から表示する
 			else if (key == ConsoleKey.End)
 			{
 				children_V.ShowTail();
@@ -127,22 +129,34 @@ internal class App(
 			// 入力
 			else
 			{
-				string text = input.ReadLine(keyInfo, Input.InputMode.Input);
-				if (text.StartsWith(':'))
+				string text;
+				bool isRowCommand = keyInfo.KeyChar == ':';
+				if (isRowCommand)
+				{
+					text = input.ReadLine(Input.InputMode.RowCommand);
+				}
+				else
+				{
+					text = input.ReadLine(keyInfo, Input.InputMode.Input);
+				}
+				if (isRowCommand || text.StartsWith(':'))
 				{
 					Console.CursorVisible = false;
-					(string output, string error) = CommandManager.Execute(text.TrimStart(':'), currentDirectory.Value, clipboard);
-
-					if (string.IsNullOrEmpty(error) == false)
+					string formattedText = text.TrimStart(':');
+					if (string.IsNullOrWhiteSpace(formattedText) == false)
 					{
-						message.SetValue(error);
+						(string output, string error) = CommandManager.Execute(formattedText, currentDirectory.Value, clipboard);
+						if (string.IsNullOrEmpty(error) == false)
+						{
+							message.SetValue(error);
+						}
+						else
+						{
+							message.SetValue(output);
+						}
+						children.SetDirectory(currentDirectory.Value);
+						children.Filter(searchTerms.Values);
 					}
-					else
-					{
-						message.SetValue(output);
-					}
-					children.SetDirectory(currentDirectory.Value);
-					children.Filter(searchTerms.Values);
 					nextActionState = ActionResolver.Resolve([]);
 				}
 				else

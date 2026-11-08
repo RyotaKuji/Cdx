@@ -2,7 +2,7 @@
 {
 	public string ReadLine(InputMode mode)
 	{
-		string input = view.ReadLine(inputMode_prompt[mode]) ?? string.Empty;
+		string input = view.ReadLine(mode) ?? string.Empty;
 		string formattedText = new(input.Where(c => !char.IsControl(c)).ToArray());
 		return formattedText;
 	}
@@ -23,21 +23,14 @@
 	public ConsoleKeyInfo ReadKey(InputMode mode)
 	{
 		Console.CursorVisible = false;
-		ConsoleKeyInfo key = view.ReadKey(inputMode_prompt[mode]);
+		ConsoleKeyInfo key = view.ReadKey(mode);
 		return key;
 	}
 
 	public enum InputMode
 	{
 		Input,
-		Command,
-		FileChange,
+		AppCommand,
+		RowCommand,
 	}
-
-	Dictionary<InputMode, string> inputMode_prompt = new()
-	{
-		[InputMode.Input] = "> ",
-		[InputMode.Command] = "[CMD]",
-		[InputMode.FileChange] = "# ",
-	};
 }

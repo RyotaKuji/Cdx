@@ -3,20 +3,26 @@ using Spectre.Console.Rendering;
 
 internal class Input_V
 {
-	public string? ReadLine(string prompt)
+	public string? ReadLine(Input.InputMode mode)
 	{
 		Console.SetCursorPosition(0, 0);
 		Console.Write("\x1b[2K");
-		Console.Write(prompt);
+		ConsoleColor originalColor = Console.ForegroundColor;
+		Console.ForegroundColor = inputMode_color[mode];
+		Console.Write(inputMode_prompt[mode]);
+		Console.ForegroundColor = originalColor;
 		Console.CursorVisible = true;
 		return Console.ReadLine();
 	}
 
-	public ConsoleKeyInfo ReadKey(string prompt)
+	public ConsoleKeyInfo ReadKey(Input.InputMode mode)
 	{
 		Console.SetCursorPosition(0, 0);
 		Console.Write("\x1b[2K");
-		Console.Write(prompt);
+		ConsoleColor originalColor = Console.ForegroundColor;
+		Console.ForegroundColor = inputMode_color[mode];
+		Console.Write(inputMode_prompt[mode]);
+		Console.ForegroundColor = originalColor;
 		Console.CursorVisible = false;
 		return Console.ReadKey(true);
 	}
@@ -28,7 +34,20 @@ internal class Input_V
 
 	public IRenderable GetComp()
 	{
-		Text text = new("");
+		Text text = Text.Empty;
 		return text;
 	}
+
+	public readonly Dictionary<Input.InputMode, string> inputMode_prompt = new()
+	{
+		[Input.InputMode.Input] = "> ",
+		[Input.InputMode.AppCommand] = "[CMD]",
+		[Input.InputMode.RowCommand] = "[ROW] ",
+	};
+	public readonly Dictionary<Input.InputMode, ConsoleColor> inputMode_color = new()
+	{
+		[Input.InputMode.Input] = ConsoleColor.White,
+		[Input.InputMode.AppCommand] = ConsoleColor.Cyan,
+		[Input.InputMode.RowCommand] = ConsoleColor.Yellow,
+	};
 }
