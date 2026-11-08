@@ -13,10 +13,10 @@ internal class App(
 {
 	public string Run(DirectoryInfo initialCurrentDirectory)
 	{
-		Console.OutputEncoding = Encoding.GetEncoding("utf-8");
+		Console.OutputEncoding = Encoding.UTF8;
 		if (AccessManager.IsValidDirectory(initialCurrentDirectory, out string exceptionMessage) == false)
 		{
-			throw new InvalidOperationException(exceptionMessage);
+			throw new ArgumentException(exceptionMessage);
 		}
 		currentDirectory.SetValue(initialCurrentDirectory);
 		history.Add(currentDirectory.Value);
