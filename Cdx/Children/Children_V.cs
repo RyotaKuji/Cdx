@@ -50,7 +50,7 @@ internal class Children_V(Children model)
 				}
 			}
 			grid.AddRow(row.Select(
-				info => $"{GetItemMarker(info)} {TruncateByWidth(info.Name, maxWidth - 2, showTail)}"
+				info => $"{GetItemMarker(info)} {TruncateByWidth(info.Name, maxWidth - 3, showTail)}"
 			).ToArray());
 		}
 
