@@ -8,8 +8,8 @@ internal class Renderer
 	readonly Layout layout_input = new() { Size = 1 };
 	readonly Layout layout_main = new();
 	readonly Layout layout_bottomColumns = new();
-	readonly Layout layout_bottomColumns_left = new() { Ratio = 3 };
-	readonly Layout layout_bottomColumns_right = new() { Ratio = 1 };
+	readonly Layout layout_bottomColumn_left = new() { Ratio = 3 };
+	readonly Layout layout_bottomColumn_right = new() { Ratio = 1 };
 
 	readonly CurrentDirectory_V currentDirectory;
 	readonly Input_V input;
@@ -36,7 +36,7 @@ internal class Renderer
 		layout.SplitRows(
 				layout_input,
 				layout_main);
-		layout_bottomColumns.SplitColumns(layout_bottomColumns_left, layout_bottomColumns_right);
+		layout_bottomColumns.SplitColumns(layout_bottomColumn_left, layout_bottomColumn_right);
 		layout_blank.Update(new Rule() { Border = BoxBorder.None });
 	}
 
@@ -59,7 +59,7 @@ internal class Renderer
 			childrenColumnsCount = 3;
 
 			IRenderable comp_clipboard = clipboard.GetComp(bottomHeight);
-			layout_bottomColumns_right.Update(comp_clipboard);
+			layout_bottomColumn_right.Update(comp_clipboard);
 		}
 		else
 		{
@@ -68,8 +68,8 @@ internal class Renderer
 		}
 
 		IRenderable comp_children = children.GetComp(childrenColumnsCount, childrenWidth, bottomHeight);
-		layout_bottomColumns_left.Update(comp_children);
-		layout_bottomColumns_right.IsVisible = clipboard.HasValue;
+		layout_bottomColumn_left.Update(comp_children);
+		layout_bottomColumn_right.IsVisible = clipboard.HasValue;
 
 		List<IRenderable> components = [];
 
