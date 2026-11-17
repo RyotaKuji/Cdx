@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-internal static partial class CommandManager
+internal static partial class RowCommandManager
 {
 	static readonly Regex clipboardIndexPattern = ReplacedPattern();
 	public static (string output, string error) Execute(string command, DirectoryInfo currentDirectory, Clipboard clipboard)

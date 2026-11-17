@@ -152,7 +152,7 @@ internal class App(
 						{
 							return currentDirectory.Value.FullName;
 						}
-						(string output, string error) = CommandManager.Execute(formattedText, currentDirectory.Value, clipboard);
+						(string output, string error) = RowCommandManager.Execute(formattedText, currentDirectory.Value, clipboard);
 						if (string.IsNullOrEmpty(error) == false)
 						{
 							message.SetValue(error);
