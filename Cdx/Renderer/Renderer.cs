@@ -8,10 +8,10 @@ internal class Renderer
 	readonly Layout layout_input = new() { Size = 1 };
 	readonly Layout layout_searchTerms = new() { Size = 1 };
 	readonly Layout layout_currentDirectory = new() { Size = 1 };
-	readonly Layout layout_message = new();
 	readonly Layout layout_mainColumns = new();
 	readonly Layout layout_mainColumn_left = new() { Ratio = 3 };
 	readonly Layout layout_mainColumn_right = new() { Ratio = 1 };
+	readonly Layout layout_message = new();
 
 	readonly CurrentDirectory_V currentDirectory;
 	readonly Input_V input;
@@ -38,8 +38,8 @@ internal class Renderer
 				layout_input,
 				layout_searchTerms,
 				layout_currentDirectory,
-				layout_message,
-				layout_mainColumns);
+				layout_mainColumns,
+				layout_message);
 		layout_mainColumns.SplitColumns(layout_mainColumn_left, layout_mainColumn_right);
 	}
 
@@ -53,18 +53,19 @@ internal class Renderer
 		layout_input.Update(comp_input);
 		layout_searchTerms.Update(comp_searchTerms);
 		layout_message.Update(comp_message);
+		layout_currentDirectory.Update(comp_currentDirectory);
 		layout_message.IsVisible = message.HasValue;
 		layout_mainColumns.IsVisible = message.HasValue == false;
-		layout_currentDirectory.Update(comp_currentDirectory);
 
-		int mainHeight = Console.WindowHeight - (message.HasValue ? 5 : 4);
+		int mainHeight = Console.WindowHeight -
+			(int)layout_input.Size! -
+			(int)layout_searchTerms.Size! -
+			(int)layout_currentDirectory.Size!;
 		int childrenWidth;
-		int childrenColumnsCount;
 
 		if (clipboard.HasValue)
 		{
 			childrenWidth = Console.WindowWidth / 4 * 3;
-			childrenColumnsCount = 3;
 
 			IRenderable comp_clipboard = clipboard.GetComp(mainHeight);
 			layout_mainColumn_right.Update(comp_clipboard);
@@ -72,10 +73,9 @@ internal class Renderer
 		else
 		{
 			childrenWidth = Console.WindowWidth;
-			childrenColumnsCount = 4;
 		}
 
-		IRenderable comp_children = children.GetComp(childrenColumnsCount, childrenWidth, mainHeight);
+		IRenderable comp_children = children.GetComp(childrenWidth, mainHeight);
 		layout_mainColumn_left.Update(comp_children);
 		layout_mainColumn_right.IsVisible = clipboard.HasValue;
 

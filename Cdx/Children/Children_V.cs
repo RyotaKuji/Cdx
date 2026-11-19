@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System.Data;
+using System.Globalization;
+using System.Numerics;
 using System.Text;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -8,7 +10,7 @@ internal class Children_V(Children model)
 	int page = 0;
 	bool showTail = false;
 
-	public IRenderable GetComp(int columnsCount, int width, int height)
+	public IRenderable GetComp(int width, int height)
 	{
 		List<FileSystemInfo> values = model.FilteredValue.ToList();
 
@@ -21,27 +23,43 @@ internal class Children_V(Children model)
 				.Expand();
 		}
 
-		Grid grid = new Grid()
-			.AddColumns(columnsCount)
-			.Expand();
-
 		int innerHeight = height - 1;
-		int itemsCountPerPage = columnsCount * innerHeight;
-		int totalPages = (int)Math.Ceiling((double)values.Count / itemsCountPerPage);
+
+		if (innerHeight <= 0)
+		{
+			return new Grid()
+				.AddColumn()
+				.AddRow(new Text("1 / 1  ") { Justification = Justify.Right })
+				.AddRow(new Text("(Window height is too small.)"))
+				.Expand();
+		}
+
+		int totalColumnsCount = (values.Count + innerHeight - 1) / innerHeight;
+
+		int maxItemWidth = values.Select(info => GetStringWidth(GetDisplayedItemName(info, width, false))).Max();
+		int columnsCountPerPage = Math.Max(width / maxItemWidth, Math.Min(totalColumnsCount, 4));
+		int columnWidth = width / columnsCountPerPage;
+
+		int itemsCountPerPage = columnsCountPerPage * innerHeight;
+		int totalPages = (values.Count + itemsCountPerPage - 1) / itemsCountPerPage;
+
 		page = Math.Clamp(page, 0, totalPages - 1);
 		int startIndex = itemsCountPerPage * page;
-		int maxWidth = width / columnsCount - 2;
 
-		Text[] pageIndexRow = Enumerable.Repeat(Text.Empty, columnsCount - 1)
+		Text[] pageIndexRow = Enumerable.Repeat(Text.Empty, columnsCountPerPage - 1)
 			.Append(new Text($"{page + 1} / {totalPages}  ") { Justification = Justify.Right })
 			.ToArray();
+
+		Grid grid = new Grid()
+			.AddColumns(columnsCountPerPage)
+			.Expand();
 
 		grid.AddRow(pageIndexRow);
 
 		for (int i = 0; i < innerHeight; i++)
 		{
 			List<FileSystemInfo> row = [];
-			for (int j = 0; j < columnsCount; j++)
+			for (int j = 0; j < columnsCountPerPage; j++)
 			{
 				int index = startIndex + innerHeight * j + i;
 				if (index < values.Count)
@@ -50,7 +68,7 @@ internal class Children_V(Children model)
 				}
 			}
 			grid.AddRow(row.Select(
-				info => $"{GetItemMarker(info)} {TruncateByWidth(info.Name, maxWidth - 3, showTail)}"
+				info => Markup.Escape(GetDisplayedItemName(info, columnWidth, showTail))
 			).ToArray());
 		}
 
@@ -65,9 +83,11 @@ internal class Children_V(Children model)
 
 	public void ShowTail() => showTail = true;
 
-	static string GetItemMarker(FileSystemInfo item)
+	static string GetDisplayedItemName(FileSystemInfo info, int maxWidth, bool showTail)
 	{
-		return item is DirectoryInfo ? "📁" : "📄";
+		string marker = info is DirectoryInfo ? "📁" : "📄";
+		string text = TruncateByWidth(info.Name, maxWidth - 5, showTail);
+		return $"{marker} {text}  ";
 	}
 
 	static string TruncateByWidth(string text, int maxWidth, bool showTail)
@@ -113,6 +133,24 @@ internal class Children_V(Children model)
 		}
 
 		return result.ToString();
+	}
+
+	static int GetStringWidth(string text)
+	{
+		int width = 0;
+		foreach (Rune rune in text.EnumerateRunes())
+		{
+			var category = Rune.GetUnicodeCategory(rune);
+			int charWidth =
+				category is UnicodeCategory.NonSpacingMark
+					or UnicodeCategory.EnclosingMark
+					or UnicodeCategory.Format
+					or UnicodeCategory.Control
+				? 0
+				: IsWide(rune.Value) ? 2 : 1;
+			width += charWidth;
+		}
+		return width;
 	}
 
 	static bool IsWide(int code)
