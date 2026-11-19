@@ -6,10 +6,12 @@ internal class Renderer
 	readonly Layout layout = new();
 
 	readonly Layout layout_input = new() { Size = 1 };
-	readonly Layout layout_main = new();
-	readonly Layout layout_bottomColumns = new();
-	readonly Layout layout_bottomColumn_left = new() { Ratio = 3 };
-	readonly Layout layout_bottomColumn_right = new() { Ratio = 1 };
+	readonly Layout layout_searchTerms = new() { Size = 1 };
+	readonly Layout layout_currentDirectory = new() { Size = 1 };
+	readonly Layout layout_message = new();
+	readonly Layout layout_mainColumns = new();
+	readonly Layout layout_mainColumn_left = new() { Ratio = 3 };
+	readonly Layout layout_mainColumn_right = new() { Ratio = 1 };
 
 	readonly CurrentDirectory_V currentDirectory;
 	readonly Input_V input;
@@ -32,12 +34,13 @@ internal class Renderer
 		this.children = children;
 		this.clipboard = clipboard;
 		this.message = message;
-		Layout layout_blank = new Layout().Update(new Rule()).Size(1);
 		layout.SplitRows(
 				layout_input,
-				layout_main);
-		layout_bottomColumns.SplitColumns(layout_bottomColumn_left, layout_bottomColumn_right);
-		layout_blank.Update(new Rule() { Border = BoxBorder.None });
+				layout_searchTerms,
+				layout_currentDirectory,
+				layout_message,
+				layout_mainColumns);
+		layout_mainColumns.SplitColumns(layout_mainColumn_left, layout_mainColumn_right);
 	}
 
 	public void Render()
@@ -48,8 +51,13 @@ internal class Renderer
 		IRenderable comp_message = message.GetComp();
 
 		layout_input.Update(comp_input);
+		layout_searchTerms.Update(comp_searchTerms);
+		layout_message.Update(comp_message);
+		layout_message.IsVisible = message.HasValue;
+		layout_mainColumns.IsVisible = message.HasValue == false;
+		layout_currentDirectory.Update(comp_currentDirectory);
 
-		int bottomHeight = Console.WindowHeight - 4;
+		int mainHeight = Console.WindowHeight - (message.HasValue ? 5 : 4);
 		int childrenWidth;
 		int childrenColumnsCount;
 
@@ -58,8 +66,8 @@ internal class Renderer
 			childrenWidth = Console.WindowWidth / 4 * 3;
 			childrenColumnsCount = 3;
 
-			IRenderable comp_clipboard = clipboard.GetComp(bottomHeight);
-			layout_bottomColumn_right.Update(comp_clipboard);
+			IRenderable comp_clipboard = clipboard.GetComp(mainHeight);
+			layout_mainColumn_right.Update(comp_clipboard);
 		}
 		else
 		{
@@ -67,23 +75,9 @@ internal class Renderer
 			childrenColumnsCount = 4;
 		}
 
-		IRenderable comp_children = children.GetComp(childrenColumnsCount, childrenWidth, bottomHeight);
-		layout_bottomColumn_left.Update(comp_children);
-		layout_bottomColumn_right.IsVisible = clipboard.HasValue;
-
-		List<IRenderable> components = [];
-
-		components.Add(comp_searchTerms);
-		if (message.HasValue)
-		{
-			components.Add(comp_message);
-		}
-		components.Add(comp_currentDirectory);
-		components.Add(layout_bottomColumns);
-
-		Rows rows_main = new(components);
-
-		layout_main.Update(rows_main);
+		IRenderable comp_children = children.GetComp(childrenColumnsCount, childrenWidth, mainHeight);
+		layout_mainColumn_left.Update(comp_children);
+		layout_mainColumn_right.IsVisible = clipboard.HasValue;
 
 		AnsiConsole.Clear();
 		AnsiConsole.Write(layout);
