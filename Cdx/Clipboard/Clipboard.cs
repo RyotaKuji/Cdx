@@ -11,6 +11,14 @@
 		Values.Add((items, type));
 	}
 
+	public void RemoveLast()
+	{
+		if (Values.Count > 0)
+		{
+			Values.RemoveAt(Values.Count - 1);
+		}
+	}
+
 	public void Clear()
 	{
 		Values.Clear();

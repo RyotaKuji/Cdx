@@ -31,7 +31,7 @@ internal class App(
 			ConsoleKeyInfo keyInfo = input.ReadKey(Input.InputMode.AppCommand);
 			ConsoleKey key = keyInfo.Key;
 			ActionResolver.State nextActionState;
-			// 一番上の候補を選択する
+			// 最短の候補を選択する
 			if (key == ConsoleKey.Enter)
 			{
 				FileSystemInfo? selectedItem = children.GetBestMatchItem();
@@ -101,18 +101,17 @@ internal class App(
 				searchTerms.RemoveLast();
 				nextActionState = ActionResolver.Resolve(children.FilteredValue);
 			}
-			// リセット
-			else if (key == ConsoleKey.Escape)
-			{
-				searchTerms.Clear();
-				clipboard.Clear();
-				nextActionState = ActionResolver.Resolve(children.FilteredValue);
-			}
 			// クリップボードに追加
 			else if (key == ConsoleKey.DownArrow)
 			{
 				clipboard.Capture([currentDirectory.Value], Clipboard.ClipboardItemType.Parent);
 				clipboard.Capture(children.FilteredValue, Clipboard.ClipboardItemType.Child);
+				nextActionState = ActionResolver.Resolve([]);
+			}
+			// クリップボードのアイテムを削除する
+			else if (key == ConsoleKey.Delete)
+			{
+				clipboard.RemoveLast();
 				nextActionState = ActionResolver.Resolve([]);
 			}
 			// Children の表示を先頭から表示する
@@ -127,11 +126,17 @@ internal class App(
 				children_V.ShowTail();
 				nextActionState = ActionResolver.Resolve([]);
 			}
+			// リセット
+			else if (key == ConsoleKey.Escape)
+			{
+				searchTerms.Clear();
+				clipboard.Clear();
+				nextActionState = ActionResolver.Resolve(children.FilteredValue);
+			}
 			// 入力
 			else
 			{
 				bool isRowCommand = keyInfo.KeyChar == ':';
-
 				string text;
 				if (isRowCommand)
 				{
@@ -141,6 +146,7 @@ internal class App(
 				{
 					text = input.ReadLine(keyInfo, Input.InputMode.Input);
 				}
+
 				if (isRowCommand || text.StartsWith(':'))
 				{
 					Console.CursorVisible = false;
@@ -152,6 +158,7 @@ internal class App(
 						{
 							return currentDirectory.Value.FullName;
 						}
+
 						(string output, string error) = RowCommandManager.Execute(formattedText, currentDirectory.Value, clipboard);
 						if (string.IsNullOrEmpty(error) == false)
 						{
@@ -161,9 +168,11 @@ internal class App(
 						{
 							message.SetValue(output);
 						}
+
 						children.SetDirectory(currentDirectory.Value);
 						children.Filter(searchTerms.Values);
 					}
+
 					nextActionState = ActionResolver.Resolve([]);
 				}
 				else
